@@ -1,11 +1,7 @@
 import React, { Component } from 'react';
 
-import {
-  getMovies,
-  deleteMovie,
-  saveMovie
-} from './../services/fakeMovieService';
-import Favorite from './favorite';
+import { getMovies } from './../services/fakeMovieService';
+import Favorite from './common/favorite';
 
 class Movies extends Component {
   state = {
