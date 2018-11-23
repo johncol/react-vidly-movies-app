@@ -2,20 +2,28 @@ import React, { Component } from 'react';
 
 import { getMovies } from './../services/fakeMovieService';
 import Favorite from './common/favorite';
+import Pagination from './common/pagination';
+import paginate from '../services/utils/paginate';
 
 class Movies extends Component {
   state = {
-    movies: getMovies()
+    movies: [],
+    moviesPerPage: 2,
+    currentPage: 1
   };
 
-  delete = movie => {
+  componentDidMount = () => {
+    this.setState({ movies: getMovies() });
+  };
+
+  handleDeleteMovie = movie => {
     const movies = [...this.state.movies];
     const index = movies.indexOf(movie);
     movies.splice(index, 1);
     this.setState({ movies });
   };
 
-  toggleFavorite = movie => {
+  handleToggleFavorite = movie => {
     const updatedMovie = {
       ...movie,
       isFavorite: !movie.isFavorite
@@ -28,13 +36,20 @@ class Movies extends Component {
     this.setState({ movies });
   };
 
+  handlePageChange = page => {
+    this.setState({ currentPage: page });
+  };
+
   render() {
-    const count = this.state.movies.length;
+    const { length: count } = this.state.movies;
+    const { currentPage, moviesPerPage, movies: allMovies } = this.state;
 
     const thereAreNotMoviesAvailable = count === 0;
     if (thereAreNotMoviesAvailable) {
       return <p>There are not any movies available</p>;
     }
+
+    const movies = paginate(allMovies, currentPage, moviesPerPage);
 
     return (
       <section>
@@ -51,7 +66,7 @@ class Movies extends Component {
             </tr>
           </thead>
           <tbody>
-            {this.state.movies.map(movie => (
+            {movies.map(movie => (
               <tr key={movie._id}>
                 <td>{movie.title}</td>
                 <td>{movie.genre.name}</td>
@@ -60,12 +75,12 @@ class Movies extends Component {
                 <td style={{ textAlign: 'center' }}>
                   <Favorite
                     isFavorite={movie.isFavorite}
-                    onToggleFavorite={() => this.toggleFavorite(movie)}
+                    onToggleFavorite={() => this.handleToggleFavorite(movie)}
                   />
                 </td>
                 <td>
                   <button
-                    onClick={() => this.delete(movie)}
+                    onClick={() => this.handleDeleteMovie(movie)}
                     className="btn btn-danger btn-sm"
                   >
                     Delete
@@ -75,6 +90,12 @@ class Movies extends Component {
             ))}
           </tbody>
         </table>
+        <Pagination
+          totalItems={count}
+          itemsPerPage={this.state.moviesPerPage}
+          currentPage={this.state.currentPage}
+          onPageChange={this.handlePageChange}
+        />
       </section>
     );
   }
