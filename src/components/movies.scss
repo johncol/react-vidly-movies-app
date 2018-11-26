@@ -1,0 +1,13 @@
+.movies-container {
+  display: flex;
+  justify-content: space-between;
+
+  & > :first-child {
+    flex-grow: 1;
+  }
+
+  & > :last-child {
+    flex-grow: 3;
+    padding-left: 30px;
+  }
+}
